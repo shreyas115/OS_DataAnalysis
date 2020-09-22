@@ -5,8 +5,7 @@ void readFile(char* file_name,int *count, char wordArray[10][30])
 {	
 	FILE *fp;
 	char word[30];
-	char* localArray[30];
-	int wordCount = 0, i;
+	int wordCount = 0;
 	fp = fopen(file_name, "r");
 	if(fp!=NULL) {
 		while(fscanf(fp," %s ", word)!=EOF){
@@ -21,7 +20,6 @@ void readFile(char* file_name,int *count, char wordArray[10][30])
 }
 int main()
 {	int i,j,count;
-	char* file_name;
 	char words[10][30];
 	char words1[10][30];
 	readFile("pos.txt",&count,words);
