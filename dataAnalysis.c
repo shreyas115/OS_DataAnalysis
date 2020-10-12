@@ -2,22 +2,48 @@
 #include "stat.h"
 #include "user.h"
 #include<stddef.h>
+#include "fcntl.h"
+
 char buf[512];
-char* posWordArray[100];
-char* negWordArray[100];
-char* reviewWordArray[10000];
-void readFile(int fd, int type)
+char* posWordArray[500];
+char* negWordArray[500];
+char* reviewWordArray[500];
+void readPosFile(int fd)
 {
   int i,n,count,words;
   count=0;
-  char* allLines = malloc(10000);
+  char* allPosLines = malloc(500);
+  memset(buf, 0,512);
+  while((n = read(fd, buf, sizeof(buf))) > 0){
+      	strcpy(allPosLines,buf);	      
+  }
+
+ int len= strlen(allPosLines);
+ char *word = malloc(500);
+ words=0;
+ for(i=0;i<len;i++)
+ {
+	 word[count++]=allPosLines[i];
+	 if(allPosLines[i]=='\n')
+	{
+		words++;
+		posWordArray[words-1] = word;
+		write(0,posWordArray[words-1],count);
+		count = 0;
+	}
+ }
+}
+void readNegFile(int fd)
+{
+  int i,n,count,words;
+  count=0;
+  char* allLines = malloc(500);
   while((n = read(fd, buf, sizeof(buf))) > 0){
       	strcpy(allLines,buf);	      
     }
- char* fileWords[10000];
 
  int len = strlen(allLines);
- char *word = malloc(100);
+ char *word = malloc(500);
  words=0;
  for(i=0;i<len;i++)
  {
@@ -25,17 +51,35 @@ void readFile(int fd, int type)
 	 if(allLines[i]=='\n')
 	{
 		words++;
-		fileWords[words-1] = word;
-		write(0,fileWords[words-1],count);
+		negWordArray[words-1] = word;
+		write(0,negWordArray[words-1],count);
 		count = 0;
 	}
  }
- if(type == 1)
-	 *reviewWordArray = *fileWords;
- else if(type ==2 )
-	 *posWordArray = *fileWords;
- else if(type ==3)
-	 *negWordArray = *fileWords;
+}
+void readReviewFile(int fd)
+{
+  int i,n,count,words;
+  count=0;
+  char* allLines = malloc(500);
+  while((n = read(fd, buf, sizeof(buf))) > 0){
+      	strcpy(allLines,buf);	      
+    }
+
+ int len = strlen(allLines);
+ char *word = malloc(500);
+ words=0;
+ for(i=0;i<len;i++)
+ {
+	 word[count++]=allLines[i];
+	 if(allLines[i]==' ')
+	{
+		words++;
+		reviewWordArray[words-1] = word;
+		write(0,reviewWordArray[words-1],count);
+		count = 0;
+	}
+ }
 }
 
 int main(int argc, char *argv[])
@@ -45,13 +89,28 @@ int main(int argc, char *argv[])
 	  printf(1,"bye",4);
     	exit();
   }
-  for(i = 1; i < argc; i++){
-   	 if((fd = open(argv[i],0)) < 0){
-     	 	printf(1, "cannot open %s", argv[i]);
-     	 	exit();
-	 }
-    	readFile(fd,i);
-   }
+if((fd = open(argv[1],0)) < 0){
+ 	printf(1, "cannot open %s", argv[1]);
+     	exit();
+  }
+  readReviewFile(fd);
   close(fd);
+if((fd = open(argv[2],0)) < 0){
+ 	printf(1, "cannot open %s", argv[2]);
+     	exit();
+  }
+  readNegFile(fd);
+  close(fd);
+
+ if((fd = open(argv[3],0)) < 0){
+ 	printf(1, "cannot open %s", argv[i]);
+     	exit();
+  }
+  readPosFile(fd);
+  close(fd);
+  int len = sizeof(posWordArray)/sizeof(posWordArray[0]);
+  char length[2];
+  sprintf(length,"%d\n",len);
+  write(0,length,2);
   exit();
 }
