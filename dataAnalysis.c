@@ -8,6 +8,9 @@ char buf[512];
 char* posWordArray[500];
 char* negWordArray[500];
 char* reviewWordArray[500];
+int posWordCount = 0;
+int negWordCount = 0;
+int reviewCount = 0;
 void readPosFile(int fd)
 {
   int i,n,count,words;
@@ -30,6 +33,7 @@ void readPosFile(int fd)
 		posWordArray[words-1] = word;
 		write(0,posWordArray[words-1],count);
 		count = 0;
+		posWordCount++;
 	}
  }
 }
@@ -54,6 +58,7 @@ void readNegFile(int fd)
 		negWordArray[words-1] = word;
 		write(0,negWordArray[words-1],count);
 		count = 0;
+		negWordCount++;
 	}
  }
 }
@@ -78,15 +83,16 @@ void readReviewFile(int fd)
 		reviewWordArray[words-1] = word;
 		write(0,reviewWordArray[words-1],count);
 		count = 0;
+		reviewCount++;
 	}
  }
 }
 
 int main(int argc, char *argv[])
 {
-  int fd, i;
+  int fd;
   if(argc <= 1){
-	  printf(1,"bye",4);
+	  printf(1,"Please provide three files",40);
     	exit();
   }
 if((fd = open(argv[1],0)) < 0){
@@ -103,14 +109,16 @@ if((fd = open(argv[2],0)) < 0){
   close(fd);
 
  if((fd = open(argv[3],0)) < 0){
- 	printf(1, "cannot open %s", argv[i]);
+ 	printf(1, "cannot open %s", argv[3]);
      	exit();
   }
   readPosFile(fd);
   close(fd);
-  int len = sizeof(posWordArray)/sizeof(posWordArray[0]);
-  char length[2];
-  sprintf(length,"%d\n",len);
-  write(0,length,2);
+
+  //char length[2];
+  //sprintf(length,"%d\n",len);
+  printf(1,"Pos word count %d",posWordCount);
+  printf(1,"Neg word count %d",negWordCount);
+  printf(1,"Review word count %d",reviewCount);
   exit();
 }
