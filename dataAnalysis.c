@@ -11,6 +11,9 @@ char* reviewWordArray[500];
 int posWordCount = 0;
 int negWordCount = 0;
 int reviewCount = 0;
+int finalPosCount = 0;
+int finalNegCount = 0;
+
 void readPosFile(int fd)
 {
   int i,n,count,words;
@@ -31,7 +34,7 @@ void readPosFile(int fd)
 	{
 		words++;
 		posWordArray[words-1] = word;
-		write(0,posWordArray[words-1],count);
+		//write(0,posWordArray[words-1],count);
 		count = 0;
 		posWordCount++;
 	}
@@ -56,7 +59,7 @@ void readNegFile(int fd)
 	{
 		words++;
 		negWordArray[words-1] = word;
-		write(0,negWordArray[words-1],count);
+		//write(0,negWordArray[words-1],count);
 		count = 0;
 		negWordCount++;
 	}
@@ -72,7 +75,9 @@ void readReviewFile(int fd)
     }
 
  int len = strlen(allLines);
- char *word = malloc(500);
+ char word[20];
+ char filteredWord[20];
+ int noOfChars = 0;
  words=0;
  for(i=0;i<len;i++)
  {
@@ -80,14 +85,17 @@ void readReviewFile(int fd)
 	 if(allLines[i]==' ')
 	{
 		words++;
-		reviewWordArray[words-1] = word;
-		write(0,reviewWordArray[words-1],count);
+		for(noOfChars = 0;noOfChars<count; noOfChars++)
+			filteredWord[noOfChars]=word[noOfChars];
+		reviewWordArray[words-1]=malloc(20);
+		strcpy(reviewWordArray[words-1], filteredWord);
+		//printf(1,"word : %s  %d\n",reviewWordArray[words-1],count+5);
 		count = 0;
 		reviewCount++;
+		memset(filteredWord,' ',20);
 	}
  }
 }
-
 int main(int argc, char *argv[])
 {
   int fd;
@@ -114,11 +122,32 @@ if((fd = open(argv[2],0)) < 0){
   }
   readPosFile(fd);
   close(fd);
+  int j =0;
+  int pos = 0;
+  int neg = 0;
+  for (j=0;j<reviewCount;j++)
+	printf(1,"word _%s\n_",reviewWordArray[j]);
+  for(j=0;j<posWordCount;j++)
+	printf(1,"pos _%s\n_",posWordArray[j]);
 
-  //char length[2];
-  //sprintf(length,"%d\n",len);
-  printf(1,"Pos word count %d",posWordCount);
-  printf(1,"Neg word count %d",negWordCount);
+			
+  for(j = 0;j<reviewCount;j++)
+  {
+	  //printf(1,"word : %s \n",reviewWordArray[j]);
+	  for(pos=0;pos<posWordCount;pos++)
+	  {
+		  if(strcmp(reviewWordArray[j],posWordArray[pos])==0)
+				  finalPosCount++;
+
+	  }
+	  for(neg=0;neg<negWordCount;neg++)
+	  {
+	  	if(strcmp(reviewWordArray[j],negWordArray[neg])==0)
+				finalNegCount++;
+	  }
+  }
+  printf(1,"Pos word count %d \n",finalPosCount);
+  printf(1,"Neg word count %d \n",finalNegCount);
   printf(1,"Review word count %d",reviewCount);
   exit();
 }
